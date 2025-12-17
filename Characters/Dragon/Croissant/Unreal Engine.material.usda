@@ -1,0 +1,635 @@
+#usda 1.0
+(
+    "Exported from Adobe Substance 3D Painter 11.0.2"
+    defaultPrim = "RootNode"
+)
+
+def "RootNode"
+{
+    def Scope "material"
+    {
+        def Material "skin" (
+            customData = {
+                dictionary adobe = {
+                    dictionary painter = {
+                        asset painterProject_spp = @C:/Program Files/Adobe/Adobe Substance 3D Painter/resources/starter_assets/templates/Unreal Engine.spt@
+                    }
+                }
+            }
+        )
+        {
+            asset inputs:basecolor_tex = @Unreal Engine_textures/dragonnewskin_skin_BaseColor_ACES - ACEScg.<UDIM>.png@
+            asset inputs:compositedAmbientOcclusion_tex = @Unreal Engine_textures/dragonnewskin_skin_OcclusionRoughnessMetallic_Utility - Raw.<UDIM>.png@
+            asset inputs:compositedNormalDX_tex = @Unreal Engine_textures/dragonnewskin_skin_Normal_Utility - Raw.<UDIM>.png@
+            asset inputs:metallic_tex = @Unreal Engine_textures/dragonnewskin_skin_OcclusionRoughnessMetallic_Utility - Raw.<UDIM>.png@
+            asset inputs:opacity_tex = @Unreal Engine_textures/dragonnewskin_skin_BaseColor_ACES - ACEScg.<UDIM>.png@
+            asset inputs:roughness_tex = @Unreal Engine_textures/dragonnewskin_skin_OcclusionRoughnessMetallic_Utility - Raw.<UDIM>.png@
+            token outputs:adobe:surface.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/AdobeStandardMaterial_4_0Shader.outputs:surface>
+            token outputs:displacement.connect = </RootNode/material/skin/UsdPreviewSurface/UsdPreviewSurfaceShader.outputs:displacement>
+            token outputs:surface.connect = </RootNode/material/skin/UsdPreviewSurface/UsdPreviewSurfaceShader.outputs:surface>
+
+            def NodeGraph "UsdPreviewSurface"
+            {
+                def Shader "UsdPreviewSurfaceShader"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    float3 inputs:diffuseColor.connect = </RootNode/material/skin/UsdPreviewSurface/diffuseColorTextureShader.outputs:rgb>
+                    float inputs:ior = 1.4
+                    float inputs:metallic.connect = </RootNode/material/skin/UsdPreviewSurface/metallicTextureShader.outputs:b>
+                    normal3f inputs:normal.connect = </RootNode/material/skin/UsdPreviewSurface/normalTextureShader.outputs:rgb>
+                    float inputs:occlusion.connect = </RootNode/material/skin/UsdPreviewSurface/occlusionTextureShader.outputs:r>
+                    float inputs:opacity.connect = </RootNode/material/skin/UsdPreviewSurface/opacityTextureShader.outputs:a>
+                    float inputs:roughness.connect = </RootNode/material/skin/UsdPreviewSurface/roughnessTextureShader.outputs:g>
+                    token outputs:displacement
+                    token outputs:surface
+                }
+
+                def Shader "TexCoordReader"
+                {
+                    uniform token info:id = "UsdPrimvarReader_float2"
+                    token inputs:varname = "st"
+                    float2 outputs:result
+                }
+
+                def Shader "diffuseColorTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:basecolor_tex>
+                    token inputs:sourceColorSpace = "sRGB"
+                    float2 inputs:st.connect = </RootNode/material/skin/UsdPreviewSurface/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float3 outputs:rgb
+                }
+
+                def Shader "roughnessTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:roughness_tex>
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/UsdPreviewSurface/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:g
+                }
+
+                def Shader "metallicTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:metallic_tex>
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/UsdPreviewSurface/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:b
+                }
+
+                def Shader "opacityTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:opacity_tex>
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/UsdPreviewSurface/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:a
+                }
+
+                def Shader "occlusionTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:compositedAmbientOcclusion_tex>
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/UsdPreviewSurface/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:r
+                }
+
+                def Shader "normalTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    float4 inputs:bias = (-1, 1, -1, 0)
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:compositedNormalDX_tex>
+                    float4 inputs:scale = (2, -2, 2, 1)
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/UsdPreviewSurface/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    normal3f outputs:rgb
+                }
+            }
+
+            def NodeGraph "AdobeStandardMaterial_4_0"
+            {
+                def Shader "AdobeStandardMaterial_4_0Shader"
+                {
+                    uniform token info:id = "AdobeStandardMaterial_4_0"
+                    float inputs:ambientOcclusion.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/ambientOcclusionTextureShader.outputs:r>
+                    float3 inputs:baseColor.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/baseColorTextureShader.outputs:rgb>
+                    float inputs:coatIOR = 1.6
+                    float inputs:IOR = 1.4
+                    float inputs:metallic.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/metallicTextureShader.outputs:b>
+                    normal3f inputs:normal.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/normalTextureShader.outputs:rgb>
+                    float inputs:opacity.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/opacityTextureShader.outputs:a>
+                    float inputs:roughness.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/roughnessTextureShader.outputs:g>
+                    token outputs:surface
+                }
+
+                def Shader "TexCoordReader"
+                {
+                    uniform token info:id = "UsdPrimvarReader_float2"
+                    token inputs:varname = "st"
+                    float2 outputs:result
+                }
+
+                def Shader "baseColorTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:basecolor_tex>
+                    token inputs:sourceColorSpace = "sRGB"
+                    float2 inputs:st.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float3 outputs:rgb
+                }
+
+                def Shader "roughnessTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:roughness_tex>
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:g
+                }
+
+                def Shader "metallicTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:metallic_tex>
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:b
+                }
+
+                def Shader "opacityTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:opacity_tex>
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:a
+                }
+
+                def Shader "normalTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    float4 inputs:bias = (-1, 1, -1, 0)
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:compositedNormalDX_tex>
+                    float4 inputs:scale = (2, -2, 2, 1)
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    normal3f outputs:rgb
+                }
+
+                def Shader "ambientOcclusionTextureShader"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    asset inputs:file.connect = </RootNode/material/skin.inputs:compositedAmbientOcclusion_tex>
+                    token inputs:sourceColorSpace = "raw"
+                    float2 inputs:st.connect = </RootNode/material/skin/AdobeStandardMaterial_4_0/TexCoordReader.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:r
+                }
+            }
+        }
+    }
+
+    over "Dragon_RIGG"
+    {
+        over "BODY_Rig"
+        {
+            over "Body_GEO"
+            {
+                over "Body_low1"
+                {
+                    over "Body_low1" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+
+                    over "Body_low1_1" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+
+                    over "Body_low1_2" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+
+                    over "Body_low1_3" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+
+                    over "Body_low1_4" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Third_Mane_low"
+                {
+                    over "Third_Mane_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Second_Mane_low"
+                {
+                    over "Second_Mane_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "First_Mane_low"
+                {
+                    over "First_Mane_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Tail_low"
+                {
+                    over "Tail_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+            }
+        }
+
+        over "HEAD_Rig"
+        {
+            over "Head_GEO"
+            {
+                over "Eyes_Outter_low"
+                {
+                    over "Eyes_Outter_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Eyes_Inner_low"
+                {
+                    over "Eyes_Inner_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Front_Horn_low"
+                {
+                    over "Front_Horn_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Back_Horns_low"
+                {
+                    over "Back_Horns_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Base_Head_low"
+                {
+                    over "Base_Head_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Ears_Inner_Fur_low"
+                {
+                    over "Ears_Inner_Fur_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Ears_Top_Fur_low"
+                {
+                    over "Ears_Top_Fur_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Beard_low"
+                {
+                    over "Beard_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Tongue_low"
+                {
+                    over "Tongue_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Mouth_stretcher_low"
+                {
+                    over "Mouth_stretcher_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Teeth_LP"
+                {
+                    over "Rt_Small_Top_Tooth_2_low"
+                    {
+                        over "Rt_Small_Top_Tooth_2_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Small_Top_Tooth_2_low"
+                    {
+                        over "Lt_Small_Top_Tooth_2_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Rt_Small_Top_Tooth_1_low"
+                    {
+                        over "Rt_Small_Top_Tooth_1_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Small_Top_Tooth_1_low"
+                    {
+                        over "Lt_Small_Top_Tooth_1_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Rt_Small_Bottom_Tooth_low"
+                    {
+                        over "Rt_Small_Bottom_Tooth_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Small_Bottom_Tooth_low"
+                    {
+                        over "Lt_Small_Bottom_Tooth_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Rt_Top_Middle_low"
+                    {
+                        over "Rt_Top_Middle_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Top_Middle_low1"
+                    {
+                        over "Lt_Top_Middle_low1" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Rt_Bottom_Middle_low"
+                    {
+                        over "Rt_Bottom_Middle_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Bottom_Middle_low1"
+                    {
+                        over "Lt_Bottom_Middle_low1" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Rt_Second_Bottom_Teeth_low"
+                    {
+                        over "Rt_Second_Bottom_Teeth_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Second_Bottom_Teeth_low1"
+                    {
+                        over "Lt_Second_Bottom_Teeth_low1" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Rt_Second_Top_Teeth_low"
+                    {
+                        over "Rt_Second_Top_Teeth_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Second_Top_Teeth_low1"
+                    {
+                        over "Lt_Second_Top_Teeth_low1" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Rt_Third_Bottom_Teeth_low"
+                    {
+                        over "Rt_Third_Bottom_Teeth_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Third_Bottom_Teeth_low1"
+                    {
+                        over "Lt_Third_Bottom_Teeth_low1" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Rt_Third_Top_Teeth_low"
+                    {
+                        over "Rt_Third_Top_Teeth_low" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+
+                    over "Lt_Third_Top_Teeth_low1"
+                    {
+                        over "Lt_Third_Top_Teeth_low1" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            rel material:binding = </RootNode/material/skin>
+                        }
+                    }
+                }
+            }
+        }
+
+        over "ARMS_Rig"
+        {
+            over "Arms_GEO"
+            {
+                over "Arms_Spikes_low"
+                {
+                    over "Arms_Spikes_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+
+                over "Arms_Fur_low"
+                {
+                    over "Arms_Fur_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+            }
+        }
+
+        over "LEGS_Rig"
+        {
+            over "Legs_GEO"
+            {
+                over "Legs_Fur_low"
+                {
+                    over "Legs_Fur_low" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </RootNode/material/skin>
+                    }
+                }
+            }
+        }
+    }
+}
+
